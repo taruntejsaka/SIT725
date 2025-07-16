@@ -1,0 +1,24 @@
+body {
+  background-color: #f0f8ff; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  color: #1f2b36;
+  font-weight: bold;
+  margin-top: 50px;
+}
+
+.container {
+  margin-top: 40px;
+}
+
+.btn {
+  background-color: #046459;
+}
+
+.btn:hover {
+  background-color: #026a59;
+}
