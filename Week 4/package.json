@@ -17,7 +17,9 @@
   "homepage": "https://github.com/taruntejsaka/SIT725#readme",
   "description": "",
   "dependencies": {
+    "body-parser": "^2.2.0",
     "express": "^5.1.0",
+    "mongodb": "^6.18.0",
     "mongoose": "^8.17.0"
   }
 }

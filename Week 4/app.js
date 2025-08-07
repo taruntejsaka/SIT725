@@ -1,96 +1,76 @@
-var express = require('express');
-var app = express();
-var port = 3000;
+const express = require('express');
+const mongoose = require('mongoose');
 
-var mongoose = require('mongoose');
-var app = express();
-var port = 3000;
+const app = express();
+const port = 3000;
 
-// Serve static files from the "public" folder
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/myprojectDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+mongoose.connection.on('connected', () => {
+  console.log('✅ Connected to MongoDB!');
+});
+
+// Define Project schema and model
+const ProjectSchema = new mongoose.Schema({
+  title: String,
+  image: String,
+  link: String,
+  description: String,
+});
+
+const Project = mongoose.model('Project', ProjectSchema);
+
+// Serve static files from "public" folder
 app.use(express.static('public'));
 
-// Helper function to validate and parse numbers
-function parseNumbers(req, res) {
-  const num1 = parseFloat(req.query.num1);
-  const num2 = parseFloat(req.query.num2);
-
-  if (isNaN(num1) || isNaN(num2)) {
-    res.status(400).send('Error: num1 and num2 must be valid numbers.');
-    return null;
-  }
-  return { num1, num2 };
-}
-
-// Add endpoint
-app.get('/add', (req, res) => {
-  const nums = parseNumbers(req, res);
-  if (!nums) return;
-  const result = nums.num1 + nums.num2;
-  res.send(`Addition Result: ${result}`);
-});
-
-// Subtract endpoint
-app.get('/subtract', (req, res) => {
-  const nums = parseNumbers(req, res);
-  if (!nums) return;
-  const result = nums.num1 - nums.num2;
-  res.send(`Subtraction Result: ${result}`);
-});
-
-// Multiply endpoint
-app.get('/multiply', (req, res) => {
-  const nums = parseNumbers(req, res);
-  if (!nums) return;
-  const result = nums.num1 * nums.num2;
-  res.send(`Multiplication Result: ${result}`);
-});
-
-// Divide endpoint
-app.get('/divide', (req, res) => {
-  const nums = parseNumbers(req, res);
-  if (!nums) return;
-
-  if (nums.num2 === 0) {
-    res.status(400).send('Error: Cannot divide by zero.');
-    return;
-  }
-
-  const result = nums.num1 / nums.num2;
-  res.send(`Division Result: ${result}`);
-});
-
-// Percentage endpoint
-app.get('/percentage', (req, res) => {
-  const nums = parseNumbers(req, res);
-  if (!nums) return;
-
-  if (nums.num2 === 0) {
-    return res.status(400).send('Error: Cannot calculate percentage with denominator zero.');
-  }
-
-  const result = (nums.num1 / nums.num2) * 100;
-  res.send(`Percentage Result: ${result.toFixed(2)}%`);
-});
-// Square
-app.get('/square', (req, res) => {
-  const num = parseFloat(req.query.num);
-  res.send(`Result: ${num * num}`);
-});
-
-// Square root
-app.get('/squareroot', (req, res) => {
-  const num = parseFloat(req.query.num);
-  if (num < 0) {
-    res.send("Error: Cannot calculate square root of a negative number");
-  } else {
-    res.send(`Result: ${Math.sqrt(num)}`);
+// API route to get all projects (kitten cards)
+app.get('/api/projects', async (req, res) => {
+  try {
+    const projects = await Project.find({});
+    res.json({ statusCode: 200, data: projects, message: "Success" });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Error fetching projects" });
   }
 });
+
+// Route to insert sample data (run once)
+app.get('/api/initData', async (req, res) => {
+  const sampleData = [
+    {
+      title: "Kitten 2",
+      image: "images/kitten-2.jpg",
+      link: "About Kitten 2",
+      description: "Demo description about kitten 2",
+    },
+    {
+      title: "Kitten 3",
+      image: "images/kitten-3.jpg",
+      link: "About Kitten 3",
+      description: "Demo description about kitten 3",
+    },
+  ];
+
+  try {
+    await Project.insertMany(sampleData);
+    res.send("✅ Sample data inserted!");
+  } catch (err) {
+    res.status(500).send("Error inserting sample data");
+  }
+});
+
+app.get('/test', (req, res) => {
+  res.send("Test route is working!");
+});
+
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'UP', message: 'Server is running smoothly!' });
 });
-
 
 // Start the server
 app.listen(port, () => {
