@@ -1,29 +1,32 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const path = require('path');
-const projectRoutes = require('./routes/projectRoutes');
 
 const app = express();
+const port = 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Database connection
+mongoose.connect('mongodb://localhost:27017/myprojectDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-// Serve static files from /public
+// Serve static files from public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/mydatabase', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB Connection Error:", err));
+// Serve HTML from views
+app.use(express.static(path.join(__dirname, 'views')));
 
-// Mount routes at root
-app.use('/', projectRoutes);
-app.use('/api/projects', projectRoutes);
+// API Routes
+const projectRoutes = require('./routes/projectRoutes');
+app.use('/api', projectRoutes);
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+// Serve main HTML
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/index.html'));
+});
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});

@@ -1,15 +1,8 @@
 const express = require('express');
-const path = require('path');
 const router = express.Router();
-const projectController = require('../controllers/projectcontroller');
+const projectController = require('../controllers/projectController');
 
-// Serve homepage
-router.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'views', 'index.html'));
-});
-
-// API routes
 router.get('/projects', projectController.getProjects);
-router.get('/init', projectController.initData);
+router.get('/initData', projectController.seedData);
 
 module.exports = router;

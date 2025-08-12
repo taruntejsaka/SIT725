@@ -1,36 +1,34 @@
-const Project = require('../models/projectModel');
+const Project = require('../models/Project');
 
-// GET all projects
 exports.getProjects = async (req, res) => {
   try {
     const projects = await Project.find();
-    res.json(projects);
+    res.json({ statusCode: 200, data: projects, message: "Success" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ statusCode: 500, message: "Error fetching projects" });
   }
 };
 
-// Insert sample projects
-exports.initData = async (req, res) => {
+exports.seedData = async (req, res) => {
+  const sampleData = [
+    {
+      title: "Kitten 2",
+      image: "/images/kitten-2.jpg",
+      link: "#",
+      description: "Demo description about kitten 2",
+    },
+    {
+      title: "Kitten 3",
+      image: "/images/kitten-3.jpg",
+      link: "#",
+      description: "Demo description about kitten 3",
+    }
+  ];
+
   try {
-    const sampleProjects = [
-      {
-        title: "Kitten Project",
-        image: "/images/kitten-1.jpg",
-        link: "#",
-        description: "A cute kitten project."
-      },
-      {
-        title: "Another Project",
-        image: "/images/livedemo.jpg",
-        link: "#",
-        description: "Another sample project."
-      }
-    ];
-    await Project.deleteMany({});
-    await Project.insertMany(sampleProjects);
-    res.send("✅ Sample data inserted");
+    await Project.insertMany(sampleData);
+    res.send("✅ Sample data inserted!");
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).send("Error inserting sample data");
   }
 };
